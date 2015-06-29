@@ -85,6 +85,7 @@ public class main extends ActionBarActivity implements LocationListener {
     @Override
     protected void onPause() {
         super.onPause();
+        musicPlayCtrl.play(this, R.raw.quit);
         // Stop updates to save power while app paused
         mgr.removeUpdates(this);
         musicPlayCtrl.stop(this);
@@ -109,7 +110,7 @@ public class main extends ActionBarActivity implements LocationListener {
                 ", Status: " + LocationStatus[status] + ", extras=" + extras);
         if(status == LocationProvider.AVAILABLE){
             /* Play sound to notify the user */
-            musicPlayCtrl.play(this, R.raw.main);
+            musicPlayCtrl.play(this, R.raw.info);
         }else{
             /* Doing something to info the user */
             musicPlayCtrl.stop(this);
