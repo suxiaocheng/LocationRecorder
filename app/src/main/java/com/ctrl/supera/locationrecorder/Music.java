@@ -24,7 +24,7 @@ public class Music implements MediaPlayer.OnPreparedListener {
 
         mp = new MediaPlayer();
         mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mp.setLooping(true);
+        mp.setLooping(false);
         try {
             mp.setDataSource(
                     context,
