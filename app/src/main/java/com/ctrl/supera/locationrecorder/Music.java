@@ -77,6 +77,21 @@ public class Music implements MediaPlayer.OnPreparedListener {
      */
     public boolean stop(Context context) {
         if (mp != null) {
+            currentPosition = 0;
+            mp.stop();
+            mp.release();
+            mp = null;
+
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Pause the music
+     */
+    public boolean pause(Context context) {
+        if (mp != null) {
             currentPosition = mp.getCurrentPosition();
             // Log.d(TAG, "stop->currentPosition:" + currentPosition);
             mp.stop();

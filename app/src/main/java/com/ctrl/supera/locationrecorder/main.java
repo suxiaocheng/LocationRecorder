@@ -202,14 +202,14 @@ public class main extends ActionBarActivity {
     };
 
     /* AsyncTask to update the screen information */
-    private class UpdateGPSStatusTask extends AsyncTask<String, Integer, Void> {
+    private class UpdateGPSStatusTask extends AsyncTask<String, Location, Void> {
         /** The system calls this to perform work in a worker thread and
          * delivers it the parameters given to AsyncTask.execute() */
         protected Void doInBackground(String... urls) {
             while(true) {
                 if (mService.needUpdate == true) {
                     mService.needUpdate = false;
-                    publishProgress(mService.test_count);
+                    publishProgress(mService.locationInfo);
                 }
                 try {
                     synchronized (this) {
@@ -231,9 +231,9 @@ public class main extends ActionBarActivity {
         protected void onPostExecute(Void result) {
         }
 
-        protected void onProgressUpdate(Integer... progress) {
-            int value = progress[0];
-            output.setText(Integer.toString(value));
+        protected void onProgressUpdate(Location... progress) {
+            Location value = progress[0];
+            dumpLocation(value);
         }
     }
 }

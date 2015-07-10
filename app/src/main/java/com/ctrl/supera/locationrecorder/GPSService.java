@@ -29,6 +29,8 @@ public class GPSService extends Service implements LocationListener {
     /* GPS data struct */
     private String best;
     private LocationManager mgr;
+    public Location locationInfo;
+    public static boolean needUpdate = false;
 
     /* GPS Info string */
     private String LocationStatus[] = {"Location out of services",
@@ -36,9 +38,6 @@ public class GPSService extends Service implements LocationListener {
 
     /* IBinder used for service and activity communication */
     private final IBinder mBinder = new LocalBinder();
-
-    public static int test_count = 0;
-    public static boolean needUpdate = false;
 
     // Handler that receives messages from the thread
     private final class ServiceHandler extends Handler {
@@ -50,8 +49,6 @@ public class GPSService extends Service implements LocationListener {
             while (true) {
                 synchronized (this) {
                     try {
-                        test_count++;
-                        needUpdate = true;
                         wait(1000);
                     } catch (Exception e) {
                     }
@@ -86,7 +83,7 @@ public class GPSService extends Service implements LocationListener {
         mServiceLooper = thread.getLooper();
         mServiceHandler = new ServiceHandler(mServiceLooper);
 
-        mgr.requestLocationUpdates(best, 15000, 1, this);
+        mgr.requestLocationUpdates(best, 1000, 1, this);
     }
 
     @Override
@@ -118,7 +115,10 @@ public class GPSService extends Service implements LocationListener {
     }
 
     public void onLocationChanged(Location location) {
-
+        synchronized (this) {
+            locationInfo = location;
+            needUpdate = true;
+        }
     }
 
     public void onProviderDisabled(String provider) {
