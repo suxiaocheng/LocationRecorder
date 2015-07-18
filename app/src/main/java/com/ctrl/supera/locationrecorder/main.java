@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -12,17 +13,23 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.provider.Settings;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class main extends ActionBarActivity {
 
     static final String TAG = "LocationMainActivity";
     private TextView output;
+    private TextView satelliteInfoTextView;
+    private ListView gpsItemList;
 
     private String lastLocationInfo;
 
@@ -48,16 +55,22 @@ public class main extends ActionBarActivity {
     /**/
     UpdateGPSStatusTask updateTask;
 
+    /* gps database manager */
+    private DBManager gpsManager;
+    private SimpleCursorAdapter mCursorAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         if (isOPen(this) == false) {
-            //openGPS(this);
+            openGPS(this);
             Log.d(TAG, "Gps not opening");
         }
         output = (TextView) findViewById(R.id.Location);
+        satelliteInfoTextView = (TextView) findViewById(R.id.SatelliteInfo);
+        gpsItemList = (ListView) findViewById(R.id.GpsDatabaseInformation);
 
         gpsIntent = new Intent(this, GPSService.class);
         startService(gpsIntent);
@@ -65,6 +78,19 @@ public class main extends ActionBarActivity {
         GetScreenOnLock();
 
         musicPlayCtrl = new Music();
+        gpsManager = new DBManager(this);
+        Cursor mCursor = gpsManager.queryTheCursor();
+
+        mCursorAdapter = new SimpleCursorAdapter(
+                getApplicationContext(),               // The application's Context object
+                android.R.layout.simple_list_item_2,   // A layout in XML for one row in the ListView
+                mCursor,                               // The result from the query
+                new String[]{DatabaseHelper.DB_TITLE_HEADER_NAME, DatabaseHelper.DB_TITLE_HEADER_TIME},          // A string array of column names in the cursor
+                new int[]{android.R.id.text1, android.R.id.text2}, // An integer array of view IDs in the row layout
+                0);                                    // Flags (usually none are needed)
+        gpsItemList.setAdapter(mCursorAdapter);
+
+        gpsManager.add("gpsTitle");
     }
 
     private void dumpLocation(Location location) {
@@ -107,6 +133,7 @@ public class main extends ActionBarActivity {
     protected void onDestroy(){
         super.onDestroy();
         stopService(gpsIntent);
+        gpsManager.closeDB();
     }
 
     @Override
@@ -170,17 +197,16 @@ public class main extends ActionBarActivity {
      *
      * @param context
      */
-    public static final void openGPS(Context context) {
-        Intent GPSIntent = new Intent();
-        GPSIntent.setClassName("com.android.settings",
-                "com.android.settings.widget.SettingsAppWidgetProvider");
-        GPSIntent.addCategory("android.intent.category.ALTERNATIVE");
-        GPSIntent.setData(Uri.parse("custom:3"));
-        try {
-            PendingIntent.getBroadcast(context, 0, GPSIntent, 0).send();
-        } catch (PendingIntent.CanceledException e) {
-            e.printStackTrace();
+    public final void openGPS(Context context) {
+        LocationManager alm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        if (alm.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER)) {
+            //Toast.makeText(this, "GPS模块正常", Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        Toast.makeText(this, "请开启GPS！", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
+        startActivityForResult(intent, 0); // 此为设置完成后返回到获取界面
     }
 
     /** 定交ServiceConnection，用于绑定Service的*/
@@ -202,14 +228,18 @@ public class main extends ActionBarActivity {
     };
 
     /* AsyncTask to update the screen information */
-    private class UpdateGPSStatusTask extends AsyncTask<String, Location, Void> {
+    private class UpdateGPSStatusTask extends AsyncTask<String, Integer, Void> {
         /** The system calls this to perform work in a worker thread and
          * delivers it the parameters given to AsyncTask.execute() */
         protected Void doInBackground(String... urls) {
             while(true) {
                 if (mService.needUpdate == true) {
                     mService.needUpdate = false;
-                    publishProgress(mService.locationInfo);
+                    publishProgress(0);
+                }
+                if(mService.needUpdateSatellite == true){
+                    mService.needUpdateSatellite = false;
+                    publishProgress(1);
                 }
                 try {
                     synchronized (this) {
@@ -231,9 +261,14 @@ public class main extends ActionBarActivity {
         protected void onPostExecute(Void result) {
         }
 
-        protected void onProgressUpdate(Location... progress) {
-            Location value = progress[0];
-            dumpLocation(value);
+        protected void onProgressUpdate(Integer... type) {
+            Integer value = type[0];
+            if(type[0] == 0) {
+                dumpLocation(mService.locationInfo);
+            }else if(type[0] == 1){
+                satelliteInfoTextView.setText(mService.satelliteInfo);
+                //musicPlayCtrl.play(getApplicationContext(), R.raw.quit);
+            }
         }
     }
 }

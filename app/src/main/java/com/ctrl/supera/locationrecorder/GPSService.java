@@ -1,8 +1,11 @@
 package com.ctrl.supera.locationrecorder;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Criteria;
+import android.location.GpsSatellite;
+import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -16,6 +19,10 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by suxiaocheng on 7/9/15.
@@ -31,6 +38,9 @@ public class GPSService extends Service implements LocationListener {
     private LocationManager mgr;
     public Location locationInfo;
     public static boolean needUpdate = false;
+
+    /* Satellite info */
+    public static boolean needUpdateSatellite = false;
 
     /* GPS Info string */
     private String LocationStatus[] = {"Location out of services",
@@ -84,6 +94,8 @@ public class GPSService extends Service implements LocationListener {
         mServiceHandler = new ServiceHandler(mServiceLooper);
 
         mgr.requestLocationUpdates(best, 1000, 1, this);
+
+        mgr.addGpsStatusListener(statusListener);
     }
 
     @Override
@@ -144,6 +156,42 @@ public class GPSService extends Service implements LocationListener {
             // 返回Activity所关联的Service对象，这样在Activity里，就可调用Service里的一些公用方法和公用属性
             return GPSService.this;
         }
+    }
+
+    /**
+     * 卫星状态监听器
+     */
+    private List<GpsSatellite> numSatelliteList = new ArrayList<GpsSatellite>(); // 卫星信号
+    public String satelliteInfo;
+
+    private final GpsStatus.Listener statusListener = new GpsStatus.Listener() {
+        public void onGpsStatusChanged(int event) { // GPS状态变化时的回调，如卫星数
+            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            GpsStatus status = locationManager.getGpsStatus(null); //取当前状态
+            satelliteInfo = updateGpsStatus(event, status);
+
+            needUpdateSatellite = true;
+        }
+    };
+
+    private String updateGpsStatus(int event, GpsStatus status) {
+        StringBuilder sb2 = new StringBuilder("");
+        if (status == null) {
+            sb2.append("搜索到卫星个数：" +0);
+        } else if (event == GpsStatus.GPS_EVENT_SATELLITE_STATUS) {
+            int maxSatellites = status.getMaxSatellites();
+            Iterator<GpsSatellite> it = status.getSatellites().iterator();
+            numSatelliteList.clear();
+            int count = 0;
+            while (it.hasNext() && count <= maxSatellites) {
+                GpsSatellite s = it.next();
+                numSatelliteList.add(s);
+                count++;
+            }
+            sb2.append("搜索到卫星个数：" + numSatelliteList.size());
+        }
+
+        return sb2.toString();
     }
 }
 

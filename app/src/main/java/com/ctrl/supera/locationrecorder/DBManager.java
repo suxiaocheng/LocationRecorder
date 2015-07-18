@@ -11,6 +11,7 @@ import java.util.List;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
@@ -19,6 +20,10 @@ public class DBManager {
     private DatabaseHelper helper;
     private SQLiteDatabase db;
 
+    /**
+     * Create the gps manager for future use
+     * @param context
+     */
     public DBManager(Context context) {
         helper = new DatabaseHelper(context);
         //因为getWritableDatabase内部调用了mContext.openOrCreateDatabase(mName, 0, mFactory);
@@ -41,13 +46,15 @@ public class DBManager {
                             " VALUES (NULL, ?, ?)",
                     new Object[]{titleName, c.getTimeInMillis()});
             db.setTransactionSuccessful();    //设置事务成功完成
-        } finally {
+        } catch (SQLException e){
+            Log.d(TAG, e.toString());
+        }finally {
             db.endTransaction();    //结束事务
         }
     }
 
     /**
-     * delete old person
+     * delete old gps item header
      *
      * @param name
      */
