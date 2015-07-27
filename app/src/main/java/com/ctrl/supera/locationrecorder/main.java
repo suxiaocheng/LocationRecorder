@@ -14,22 +14,27 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.provider.Settings;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
-public class main extends ActionBarActivity {
+public class main extends ActionBarActivity implements gpsHeaderListFragment.OnFragmentInteractionListener, gpsItemListFragment.OnFragmentInteractionListener {
 
     static final String TAG = "LocationMainActivity";
-    private TextView output;
-    private TextView satelliteInfoTextView;
-    private ListView gpsItemList;
 
     private String lastLocationInfo;
 
@@ -56,8 +61,20 @@ public class main extends ActionBarActivity {
     UpdateGPSStatusTask updateTask;
 
     /* gps database manager */
-    private DBManager gpsManager;
+    private DBManager gpsDBManager;
     private SimpleCursorAdapter mCursorAdapter;
+
+    /**
+     * The pager widget, which handles animation and allows swiping horizontally to access previous
+     * and next wizard steps.
+     */
+    private ViewPager mPager;
+
+    /**
+     * The pager adapter, which provides the pages to the view pager widget.
+     */
+    private PagerAdapter mPagerAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,9 +85,6 @@ public class main extends ActionBarActivity {
             openGPS(this);
             Log.d(TAG, "Gps not opening");
         }
-        output = (TextView) findViewById(R.id.Location);
-        satelliteInfoTextView = (TextView) findViewById(R.id.SatelliteInfo);
-        gpsItemList = (ListView) findViewById(R.id.GpsDatabaseInformation);
 
         gpsIntent = new Intent(this, GPSService.class);
         startService(gpsIntent);
@@ -78,27 +92,32 @@ public class main extends ActionBarActivity {
         GetScreenOnLock();
 
         musicPlayCtrl = new Music();
-        gpsManager = new DBManager(this);
-        Cursor mCursor = gpsManager.queryTheCursor();
+        gpsDBManager = new DBManager(this);
+        Cursor mCursor = gpsDBManager.queryTheCursor();
 
         mCursorAdapter = new SimpleCursorAdapter(
                 getApplicationContext(),               // The application's Context object
-                android.R.layout.simple_list_item_2,   // A layout in XML for one row in the ListView
+                android.R.layout.simple_list_item_1,   // A layout in XML for one row in the ListView
                 mCursor,                               // The result from the query
-                new String[]{DatabaseHelper.DB_TITLE_HEADER_NAME, DatabaseHelper.DB_TITLE_HEADER_TIME},          // A string array of column names in the cursor
-                new int[]{android.R.id.text1, android.R.id.text2}, // An integer array of view IDs in the row layout
+                new String[]{DatabaseHelper.DB_TITLE_HEADER_NAME},          // A string array of column names in the cursor
+                new int[]{android.R.id.text2}, // An integer array of view IDs in the row layout
                 0);                                    // Flags (usually none are needed)
-        gpsItemList.setAdapter(mCursorAdapter);
+        //gpsHeaderList.setAdapter(mCursorAdapter);
 
-        gpsManager.add("gpsTitle");
+
+        // Instantiate a ViewPager and a PagerAdapter.
+        mPager = (ViewPager) findViewById(R.id.gpsMainPager);
+        mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
+        mPager.setAdapter(mPagerAdapter);
+
     }
 
     private void dumpLocation(Location location) {
         if (location != null) {
             lastLocationInfo = location.toString();
-            output.setText(lastLocationInfo);
+            //output.setText(lastLocationInfo);
         } else {
-            output.setText(R.string.UnKnowLocationInfo);
+            //output.setText(R.string.UnKnowLocationInfo);
         }
     }
 
@@ -130,10 +149,10 @@ public class main extends ActionBarActivity {
     }
 
     @Override
-    protected void onDestroy(){
+    protected void onDestroy() {
         super.onDestroy();
         stopService(gpsIntent);
-        gpsManager.closeDB();
+        gpsDBManager.closeDB();
     }
 
     @Override
@@ -209,7 +228,9 @@ public class main extends ActionBarActivity {
         startActivityForResult(intent, 0); // 此为设置完成后返回到获取界面
     }
 
-    /** 定交ServiceConnection，用于绑定Service的*/
+    /**
+     * 定交ServiceConnection，用于绑定Service的
+     */
     private ServiceConnection mConnection = new ServiceConnection() {
 
         @Override
@@ -229,15 +250,17 @@ public class main extends ActionBarActivity {
 
     /* AsyncTask to update the screen information */
     private class UpdateGPSStatusTask extends AsyncTask<String, Integer, Void> {
-        /** The system calls this to perform work in a worker thread and
-         * delivers it the parameters given to AsyncTask.execute() */
+        /**
+         * The system calls this to perform work in a worker thread and
+         * delivers it the parameters given to AsyncTask.execute()
+         */
         protected Void doInBackground(String... urls) {
-            while(true) {
+            while (true) {
                 if (mService.needUpdate == true) {
                     mService.needUpdate = false;
                     publishProgress(0);
                 }
-                if(mService.needUpdateSatellite == true){
+                if (mService.needUpdateSatellite == true) {
                     mService.needUpdateSatellite = false;
                     publishProgress(1);
                 }
@@ -248,7 +271,7 @@ public class main extends ActionBarActivity {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                if(isCancelled()){
+                if (isCancelled()) {
                     break;
                 }
             }
@@ -256,19 +279,50 @@ public class main extends ActionBarActivity {
             return null;
         }
 
-        /** The system calls this to perform work in the UI thread and delivers
-         * the result from doInBackground() */
+        /**
+         * The system calls this to perform work in the UI thread and delivers
+         * the result from doInBackground()
+         */
         protected void onPostExecute(Void result) {
         }
 
         protected void onProgressUpdate(Integer... type) {
             Integer value = type[0];
-            if(type[0] == 0) {
+            if (type[0] == 0) {
                 dumpLocation(mService.locationInfo);
-            }else if(type[0] == 1){
-                satelliteInfoTextView.setText(mService.satelliteInfo);
+            } else if (type[0] == 1) {
+                //satelliteInfoTextView.setText(mService.satelliteInfo);
                 //musicPlayCtrl.play(getApplicationContext(), R.raw.quit);
             }
         }
     }
+
+    /**
+     * A simple pager adapter that represents 5 ScreenSlidePageFragment objects, in
+     * sequence.
+     */
+    private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
+        public ScreenSlidePagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            if (position == 0) {
+                return gpsHeaderListFragment.newInstance(null, null);
+            } else {
+                return gpsItemListFragment.newInstance(null, null);
+            }
+        }
+
+        @Override
+        public int getCount() {
+            return 2;
+        }
+    }
+
+    public void onFragmentInteraction(Uri uri) {
+
+    }
+
 }

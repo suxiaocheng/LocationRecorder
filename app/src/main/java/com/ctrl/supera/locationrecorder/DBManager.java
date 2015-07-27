@@ -4,8 +4,10 @@ package com.ctrl.supera.locationrecorder;
  * Created by suxiaocheng on 7/13/15.
  */
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import android.content.ContentValues;
@@ -40,11 +42,12 @@ public class DBManager {
         db.beginTransaction();    //开始事务
         try {
             String titleName;
-            Calendar c = Calendar.getInstance();
-            titleName = name + Long.toString(c.getTimeInMillis());
+            Date now = new Date();
+            titleName = now.toString();
+
             db.execSQL("INSERT INTO " + DatabaseHelper.DB_TITLE_NAME +
                             " VALUES (NULL, ?, ?)",
-                    new Object[]{titleName, c.getTimeInMillis()});
+                    new Object[]{titleName, now.getTime()});
             db.setTransactionSuccessful();    //设置事务成功完成
         } catch (SQLException e){
             Log.d(TAG, e.toString());

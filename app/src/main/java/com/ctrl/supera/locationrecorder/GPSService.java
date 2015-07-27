@@ -42,6 +42,12 @@ public class GPSService extends Service implements LocationListener {
     /* Satellite info */
     public static boolean needUpdateSatellite = false;
 
+    /* Satellite Record function */
+    public static boolean needRecordLocation = false;
+
+    /* Database use for record location */
+    private static DBManager gpsDBManager = null;
+
     /* GPS Info string */
     private String LocationStatus[] = {"Location out of services",
             "Location unavailable", "location available"};
@@ -130,6 +136,21 @@ public class GPSService extends Service implements LocationListener {
         synchronized (this) {
             locationInfo = location;
             needUpdate = true;
+
+            if(needRecordLocation) {
+                /* First check if the database is exist or not */
+                if (gpsDBManager == null) {
+                    gpsDBManager = new DBManager(this);
+
+                    /* Add Header Item to the DataBase */
+                    gpsDBManager.add("");
+                }
+            }else{
+                if(gpsDBManager != null){
+                    gpsDBManager.closeDB();
+                    gpsDBManager = null;
+                }
+            }
         }
     }
 
