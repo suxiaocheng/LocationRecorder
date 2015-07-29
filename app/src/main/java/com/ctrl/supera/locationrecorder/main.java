@@ -51,8 +51,8 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
     private PowerManager.WakeLock mWakeLock = null;
 
     /* Service's connect information */
-    private GPSService mService;
-    private boolean mBound = false;
+    public GPSService mService;
+    public boolean mBound = false;
 
     /**/
     private Intent gpsIntent;
@@ -61,8 +61,7 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
     UpdateGPSStatusTask updateTask;
 
     /* gps database manager */
-    private DBManager gpsDBManager;
-    private SimpleCursorAdapter mCursorAdapter;
+    public DBManager gpsDBManager;
 
     /**
      * The pager widget, which handles animation and allows swiping horizontally to access previous
@@ -93,17 +92,6 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
 
         musicPlayCtrl = new Music();
         gpsDBManager = new DBManager(this);
-        Cursor mCursor = gpsDBManager.queryTheCursor();
-
-        mCursorAdapter = new SimpleCursorAdapter(
-                getApplicationContext(),               // The application's Context object
-                android.R.layout.simple_list_item_1,   // A layout in XML for one row in the ListView
-                mCursor,                               // The result from the query
-                new String[]{DatabaseHelper.DB_TITLE_HEADER_NAME},          // A string array of column names in the cursor
-                new int[]{android.R.id.text2}, // An integer array of view IDs in the row layout
-                0);                                    // Flags (usually none are needed)
-        //gpsHeaderList.setAdapter(mCursorAdapter);
-
 
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (ViewPager) findViewById(R.id.gpsMainPager);
@@ -113,11 +101,15 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
     }
 
     private void dumpLocation(Location location) {
+        gpsHeaderListFragment fragment = (gpsHeaderListFragment) ((ScreenSlidePagerAdapter) mPagerAdapter).getItem(0);
+        if(fragment == null){
+            return;
+        }
         if (location != null) {
             lastLocationInfo = location.toString();
-            //output.setText(lastLocationInfo);
+            fragment.output.setText(lastLocationInfo);
         } else {
-            //output.setText(R.string.UnKnowLocationInfo);
+            fragment.output.setText(R.string.UnKnowLocationInfo);
         }
     }
 
@@ -291,8 +283,11 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
             if (type[0] == 0) {
                 dumpLocation(mService.locationInfo);
             } else if (type[0] == 1) {
-                //satelliteInfoTextView.setText(mService.satelliteInfo);
-                //musicPlayCtrl.play(getApplicationContext(), R.raw.quit);
+                gpsHeaderListFragment fragment = (gpsHeaderListFragment) ((ScreenSlidePagerAdapter) mPagerAdapter).getItem(0);
+                if(fragment == null){
+                    return;
+                }
+                fragment.satelliteInfoTextView.setText(mService.satelliteInfo);
             }
         }
     }
@@ -302,17 +297,18 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
      * sequence.
      */
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
+        private Fragment[] fragments = {gpsHeaderListFragment.newInstance(null, null), gpsItemListFragment.newInstance(null, null)};
+
         public ScreenSlidePagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
         @Override
         public Fragment getItem(int position) {
-            if (position == 0) {
-                return gpsHeaderListFragment.newInstance(null, null);
-            } else {
-                return gpsItemListFragment.newInstance(null, null);
+            if (position < fragments.length) {
+                return fragments[position];
             }
+            return null;
         }
 
         @Override

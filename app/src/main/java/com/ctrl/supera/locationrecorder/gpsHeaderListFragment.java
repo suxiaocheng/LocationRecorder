@@ -1,9 +1,11 @@
 package com.ctrl.supera.locationrecorder;
 
 import android.app.Activity;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,12 +37,15 @@ public class gpsHeaderListFragment extends Fragment implements View.OnClickListe
 
     private OnFragmentInteractionListener mListener;
 
-    private TextView output;
-    private TextView satelliteInfoTextView;
-    private ListView gpsHeaderList;
+    public TextView output;
+    public TextView satelliteInfoTextView;
+    public ListView gpsHeaderList;
 
     private boolean bRecordStatus;
     private Button btRecordCtrl;
+
+    /* Gps Cursor adapter */
+    private SimpleCursorAdapter mCursorAdapter;
 
     /**
      * Use this factory method to create a new instance of
@@ -88,6 +93,16 @@ public class gpsHeaderListFragment extends Fragment implements View.OnClickListe
 
         btRecordCtrl = (Button) rootview.findViewById(R.id.LocationStart);
         btRecordCtrl.setOnClickListener(this);
+
+        Cursor mCursor = ((main)getActivity()).gpsDBManager.queryTheCursor();
+        mCursorAdapter = new SimpleCursorAdapter(
+                getActivity().getApplicationContext(),               // The application's Context object
+                android.R.layout.simple_list_item_1,   // A layout in XML for one row in the ListView
+                mCursor,                               // The result from the query
+                new String[]{DatabaseHelper.DB_TITLE_HEADER_NAME},          // A string array of column names in the cursor
+                new int[]{android.R.id.text2}, // An integer array of view IDs in the row layout
+                0);                                    // Flags (usually none are needed)
+        gpsHeaderList.setAdapter(mCursorAdapter);
 
         return rootview;
     }
@@ -139,11 +154,11 @@ public class gpsHeaderListFragment extends Fragment implements View.OnClickListe
             case R.id.LocationStart:
                 if (bRecordStatus == false) {
                     bRecordStatus = true;
-                    //mService.needRecordLocation = true;
+                    ((main)getActivity()).mService.needRecordLocation = true;
                     btRecordCtrl.setText("Stop");
                 } else {
                     bRecordStatus = false;
-                    //mService.needRecordLocation = false;
+                    ((main)getActivity()).mService.needRecordLocation = false;
                     btRecordCtrl.setText("Start");
                 }
                 break;
