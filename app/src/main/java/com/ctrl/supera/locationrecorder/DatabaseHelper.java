@@ -30,7 +30,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String sql = "create table if not exists " + DB_TITLE_NAME +
-                "("+DB_TITLE_HEADER_ID+" INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "(" + DB_TITLE_HEADER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 DB_TITLE_HEADER_NAME + " varchar(32) not null," +
                 DB_TITLE_HEADER_TIME + " REAL not null );";
         try {

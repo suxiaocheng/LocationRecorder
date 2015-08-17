@@ -102,7 +102,7 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
 
     private void dumpLocation(Location location) {
         gpsHeaderListFragment fragment = (gpsHeaderListFragment) ((ScreenSlidePagerAdapter) mPagerAdapter).getItem(0);
-        if(fragment == null){
+        if (fragment == null) {
             return;
         }
         if (location != null) {
@@ -127,7 +127,6 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
 
     @Override
     protected void onPause() {
-        musicPlayCtrl.play(this, R.raw.quit);
         super.onPause();
 
         updateTask.cancel(true);
@@ -284,7 +283,7 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
                 dumpLocation(mService.locationInfo);
             } else if (type[0] == 1) {
                 gpsHeaderListFragment fragment = (gpsHeaderListFragment) ((ScreenSlidePagerAdapter) mPagerAdapter).getItem(0);
-                if(fragment == null){
+                if (fragment == null) {
                     return;
                 }
                 fragment.satelliteInfoTextView.setText(mService.satelliteInfo);
@@ -320,5 +319,4 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
     public void onFragmentInteraction(Uri uri) {
 
     }
-
 }

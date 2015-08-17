@@ -94,7 +94,7 @@ public class gpsHeaderListFragment extends Fragment implements View.OnClickListe
         btRecordCtrl = (Button) rootview.findViewById(R.id.LocationStart);
         btRecordCtrl.setOnClickListener(this);
 
-        Cursor mCursor = ((main)getActivity()).gpsDBManager.queryTheCursor();
+        Cursor mCursor = ((main) getActivity()).gpsDBManager.queryTheCursor();
         mCursorAdapter = new SimpleCursorAdapter(
                 getActivity().getApplicationContext(),               // The application's Context object
                 android.R.layout.simple_list_item_1,   // A layout in XML for one row in the ListView
@@ -154,11 +154,11 @@ public class gpsHeaderListFragment extends Fragment implements View.OnClickListe
             case R.id.LocationStart:
                 if (bRecordStatus == false) {
                     bRecordStatus = true;
-                    ((main)getActivity()).mService.needRecordLocation = true;
+                    ((main) getActivity()).mService.needRecordLocation = true;
                     btRecordCtrl.setText("Stop");
                 } else {
                     bRecordStatus = false;
-                    ((main)getActivity()).mService.needRecordLocation = false;
+                    ((main) getActivity()).mService.needRecordLocation = false;
                     btRecordCtrl.setText("Start");
                 }
                 break;

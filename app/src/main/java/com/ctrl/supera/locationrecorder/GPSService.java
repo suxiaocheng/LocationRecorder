@@ -60,6 +60,7 @@ public class GPSService extends Service implements LocationListener {
         public ServiceHandler(Looper looper) {
             super(looper);
         }
+
         @Override
         public void handleMessage(Message msg) {
             while (true) {
@@ -137,7 +138,7 @@ public class GPSService extends Service implements LocationListener {
             locationInfo = location;
             needUpdate = true;
 
-            if(needRecordLocation) {
+            if (needRecordLocation) {
                 /* First check if the database is exist or not */
                 if (gpsDBManager == null) {
                     gpsDBManager = new DBManager(this);
@@ -145,8 +146,8 @@ public class GPSService extends Service implements LocationListener {
                     /* Add Header Item to the DataBase */
                     gpsDBManager.add("");
                 }
-            }else{
-                if(gpsDBManager != null){
+            } else {
+                if (gpsDBManager != null) {
                     gpsDBManager.closeDB();
                     gpsDBManager = null;
                 }
@@ -198,7 +199,7 @@ public class GPSService extends Service implements LocationListener {
     private String updateGpsStatus(int event, GpsStatus status) {
         StringBuilder sb2 = new StringBuilder("");
         if (status == null) {
-            sb2.append("搜索到卫星个数：" +0);
+            sb2.append("搜索到卫星个数：" + 0);
         } else if (event == GpsStatus.GPS_EVENT_SATELLITE_STATUS) {
             int maxSatellites = status.getMaxSatellites();
             Iterator<GpsSatellite> it = status.getSatellites().iterator();

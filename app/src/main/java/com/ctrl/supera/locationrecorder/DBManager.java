@@ -24,6 +24,7 @@ public class DBManager {
 
     /**
      * Create the gps manager for future use
+     *
      * @param context
      */
     public DBManager(Context context) {
@@ -49,9 +50,9 @@ public class DBManager {
                             " VALUES (NULL, ?, ?)",
                     new Object[]{titleName, now.getTime()});
             db.setTransactionSuccessful();    //设置事务成功完成
-        } catch (SQLException e){
+        } catch (SQLException e) {
             Log.d(TAG, e.toString());
-        }finally {
+        } finally {
             db.endTransaction();    //结束事务
         }
     }
@@ -65,7 +66,7 @@ public class DBManager {
         int item_delete;
         item_delete = db.delete(DatabaseHelper.DB_TITLE_NAME,
                 "name == ?", name);
-        Log.d(TAG, item_delete +" has been delete!");
+        Log.d(TAG, item_delete + " has been delete!");
     }
 
     /**

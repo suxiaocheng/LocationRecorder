@@ -22,7 +22,7 @@ import android.widget.TextView;
  * Use the {@link gpsItemListFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class gpsItemListFragment extends Fragment implements AdapterView.OnItemClickListener  {
+public class gpsItemListFragment extends Fragment implements AdapterView.OnItemClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
