@@ -99,7 +99,6 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
         mPager = (ViewPager) findViewById(R.id.gpsMainPager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
-
     }
 
     private void dumpLocation(Location location) {
@@ -286,7 +285,6 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
         }
 
         protected void onProgressUpdate(Integer... type) {
-            FileLog.d(TAG, "progress update: " + type[0]);
             if (type[0] == 0) {
                 if((mService != null)  && (mService.locationInfo != null)) {
                     dumpLocation(mService.locationInfo);
@@ -302,7 +300,6 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
                     fragment.satelliteInfoTextView.setText(mService.satelliteInfo);
                 }
             }
-            FileLog.d(TAG, "progress update over");
         }
     }
 

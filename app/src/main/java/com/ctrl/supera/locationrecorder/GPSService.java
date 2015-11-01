@@ -97,7 +97,6 @@ public class GPSService extends Service implements LocationListener {
         Criteria criteria = new Criteria();
         best = mgr.getBestProvider(criteria, true);
         FileLog.d(TAG, "Best provider is: " + best);
-        FileLog.d(TAG, "Locations (starting with last known):");
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
             if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -113,6 +112,7 @@ public class GPSService extends Service implements LocationListener {
         }
 
         Location location = mgr.getLastKnownLocation(best);
+        FileLog.d(TAG, "Locations (starting with last known):" + location.toString());
 
         // Get the HandlerThread's Looper and use it for our Handler
         mServiceLooper = thread.getLooper();

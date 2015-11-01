@@ -8,32 +8,9 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".main">
 
-    <LinearLayout
-        android:id="@+id/GpsTextInformation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_centerHorizontal="true">
-
-        <TextView
-            android:id="@+id/LocationInfo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/LocationInfo" />
-
-        <TextView
-            android:id="@+id/Location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/LocationInfo"
-            android:layout_toRightOf="@id/LocationInfo"
-            android:text="@string/Location" />
-    </LinearLayout>
-
     <android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/gpsMainPager"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/GpsTextInformation"></android.support.v4.view.ViewPager>
+        android:layout_height="wrap_content"></android.support.v4.view.ViewPager>
 
 </RelativeLayout>

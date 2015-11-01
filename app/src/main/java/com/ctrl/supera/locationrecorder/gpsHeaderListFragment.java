@@ -84,7 +84,6 @@ public class gpsHeaderListFragment extends Fragment implements View.OnClickListe
         // Inflate the layout for this fragment
         View rootview = inflater.inflate(R.layout.fragment_gps_header_list, container, false);
 
-
         /* GPS Header information control */
         output = (TextView) rootview.findViewById(R.id.Location);
         satelliteInfoTextView = (TextView) rootview.findViewById(R.id.SatelliteInfo);
