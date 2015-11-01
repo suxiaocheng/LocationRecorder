@@ -4,7 +4,11 @@
     <string name="app_name">LocationRecorder</string>
     <string name="LocationInfo">LocationInformation:</string>
     <string name="Location"></string>
-    <string name="SatelliteInfo"></string>
+    <string name="SatelliteInfo">SatelliteInfo: </string>
+    <string name="AverageSpeedInfo">Average Speed: </string>
+    <string name="InstanceSpeedInfo">Instance Speed: </string>
+    <string name="RecordTimeInfo">Total Time: </string>
+    <string name="DistanceInfo">Distance: </string>
     <string name="LocationStart">Start</string>
     <string name="LocationShow">Show</string>
     <string name="UnKnowLocationInfo">Can\'t get any location, please wait...</string>

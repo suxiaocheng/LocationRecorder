@@ -1,8 +1,10 @@
 package com.ctrl.supera.locationrecorder;
 
+import android.Manifest;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
@@ -11,6 +13,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -19,6 +22,8 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.ctrl.supera.locationrecorder.debug.FileLog;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -91,8 +96,21 @@ public class GPSService extends Service implements LocationListener {
 
         Criteria criteria = new Criteria();
         best = mgr.getBestProvider(criteria, true);
-        Log.d(TAG, "Best provider is: " + best);
-        Log.d(TAG, "Locations (starting with last known):");
+        FileLog.d(TAG, "Best provider is: " + best);
+        FileLog.d(TAG, "Locations (starting with last known):");
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    public void requestPermissions(@NonNull String[] permissions, int requestCode)
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for Activity#requestPermissions for more details.
+                stopSelf();
+            }
+        }
 
         Location location = mgr.getLastKnownLocation(best);
 
@@ -127,16 +145,36 @@ public class GPSService extends Service implements LocationListener {
 
     @Override
     public void onDestroy() {
-        // Stop updates to save power while app paused
-        mgr.removeUpdates(this);
+        boolean permission_valid = true;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    public void requestPermissions(@NonNull String[] permissions, int requestCode)
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for Activity#requestPermissions for more details.
+                permission_valid = false;
+            }
+        }
+
+        if(permission_valid == true){
+            // Stop updates to save power while app paused
+            mgr.removeUpdates(this);
+        }
 
         Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show();
     }
 
     public void onLocationChanged(Location location) {
         synchronized (this) {
-            locationInfo = location;
-            needUpdate = true;
+            FileLog.d(TAG, "Location change ");
+            if(location != null){
+                locationInfo = location;
+                needUpdate = true;
+                FileLog.d(TAG, "Location info: " + locationInfo.toString());
+            }
 
             if (needRecordLocation) {
                 /* First check if the database is exist or not */
@@ -146,6 +184,8 @@ public class GPSService extends Service implements LocationListener {
                     /* Add Header Item to the DataBase */
                     gpsDBManager.add("");
                 }
+                /* Log location information to file */
+                FileLog.d(TAG, location.toString());
             } else {
                 if (gpsDBManager != null) {
                     gpsDBManager.closeDB();
@@ -156,16 +196,16 @@ public class GPSService extends Service implements LocationListener {
     }
 
     public void onProviderDisabled(String provider) {
-        Log.d(TAG, "Provider disabled: " + provider);
+        FileLog.d(TAG, "Provider disabled: " + provider);
     }
 
     public void onProviderEnabled(String provider) {
-        Log.d(TAG, "Provider enabled: " + provider);
+        FileLog.d(TAG, "Provider enabled: " + provider);
     }
 
     public void onStatusChanged(String provider, int status,
                                 Bundle extras) {
-        Log.d(TAG, "Provider status changed: " + provider +
+        FileLog.d(TAG, "Provider status changed: " + provider +
                 ", Status: " + LocationStatus[status] + ", extras=" + extras);
     }
 

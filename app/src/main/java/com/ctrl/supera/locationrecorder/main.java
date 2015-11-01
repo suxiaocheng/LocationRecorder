@@ -31,6 +31,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ctrl.supera.locationrecorder.debug.FileLog;
+
 
 public class main extends ActionBarActivity implements gpsHeaderListFragment.OnFragmentInteractionListener, gpsItemListFragment.OnFragmentInteractionListener {
 
@@ -82,7 +84,7 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
 
         if (isOPen(this) == false) {
             openGPS(this);
-            Log.d(TAG, "Gps not opening");
+            FileLog.d(TAG, "Gps not opening");
         }
 
         gpsIntent = new Intent(this, GPSService.class);
@@ -107,7 +109,11 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
         }
         if (location != null) {
             lastLocationInfo = location.toString();
-            fragment.output.setText(lastLocationInfo);
+            if(lastLocationInfo != null) {
+                fragment.output.setText(lastLocationInfo);
+            }else{
+                FileLog.d(TAG, "convert location to string fail");
+            }
         } else {
             fragment.output.setText(R.string.UnKnowLocationInfo);
         }
@@ -247,13 +253,15 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
          */
         protected Void doInBackground(String... urls) {
             while (true) {
-                if (mService.needUpdate == true) {
-                    mService.needUpdate = false;
-                    publishProgress(0);
-                }
-                if (mService.needUpdateSatellite == true) {
-                    mService.needUpdateSatellite = false;
-                    publishProgress(1);
+                if(mService != null){
+                    if (mService.needUpdate == true) {
+                        mService.needUpdate = false;
+                        publishProgress(0);
+                    }
+                    if (mService.needUpdateSatellite == true) {
+                        mService.needUpdateSatellite = false;
+                        publishProgress(1);
+                    }
                 }
                 try {
                     synchronized (this) {
@@ -278,16 +286,23 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
         }
 
         protected void onProgressUpdate(Integer... type) {
-            Integer value = type[0];
+            FileLog.d(TAG, "progress update: " + type[0]);
             if (type[0] == 0) {
-                dumpLocation(mService.locationInfo);
+                if((mService != null)  && (mService.locationInfo != null)) {
+                    dumpLocation(mService.locationInfo);
+                }else{
+                    FileLog.d(TAG, "File location info is null");
+                }
             } else if (type[0] == 1) {
                 gpsHeaderListFragment fragment = (gpsHeaderListFragment) ((ScreenSlidePagerAdapter) mPagerAdapter).getItem(0);
                 if (fragment == null) {
                     return;
                 }
-                fragment.satelliteInfoTextView.setText(mService.satelliteInfo);
+                if(mService.satelliteInfo != null) {
+                    fragment.satelliteInfoTextView.setText(mService.satelliteInfo);
+                }
             }
+            FileLog.d(TAG, "progress update over");
         }
     }
 

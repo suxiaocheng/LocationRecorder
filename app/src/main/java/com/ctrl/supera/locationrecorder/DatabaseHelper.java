@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.ctrl.supera.locationrecorder.debug.FileLog;
+
 import java.util.Calendar;
 
 /**
@@ -36,7 +38,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         try {
             db.execSQL(sql);
         } catch (SQLException e) {
-            Log.d(TAG, e.toString());
+            FileLog.d(TAG, e.toString());
         }
     }
 

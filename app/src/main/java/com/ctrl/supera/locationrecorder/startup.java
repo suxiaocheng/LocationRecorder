@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -23,23 +24,29 @@ public class startup extends Activity {
         setContentView(R.layout.activity_startup);
 
         /* Startup logo animation operation */
-        ImageView view = (ImageView) findViewById(R.id.startup_logo);
-        ObjectAnimator animLogo = ObjectAnimator.ofFloat(view, "alpha", 0f, 1f);
-        animLogo.setDuration(2000);
-        animLogo.addListener(new AnimatorListenerAdapter() {
-            public void onAnimationEnd(Animator animation) {
-                Intent intent = new Intent(getApplicationContext(), main.class);
-                startActivity(intent);
-                finish();
-            }
-        });
-        animLogo.start();
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            ImageView view = (ImageView) findViewById(R.id.startup_logo);
+            ObjectAnimator animLogo = ObjectAnimator.ofFloat(view, "alpha", 0f, 1f);
+            animLogo.setDuration(2000);
+            animLogo.addListener(new AnimatorListenerAdapter() {
+                public void onAnimationEnd(Animator animation) {
+                    Intent intent = new Intent(getApplicationContext(), main.class);
+                    startActivity(intent);
+                    finish();
+                }
+            });
+            animLogo.start();
 
-        /* Startup text animation operation */
-        TextView startupText =  (TextView) findViewById(R.id.startup_text);
-        ObjectAnimator animText = ObjectAnimator.ofFloat(startupText, "alpha", 0f, 1f);
-        animText.setDuration(2000);
-        animText.start();
+            /* Startup text animation operation */
+            TextView startupText = (TextView) findViewById(R.id.startup_text);
+            ObjectAnimator animText = ObjectAnimator.ofFloat(startupText, "alpha", 0f, 1f);
+            animText.setDuration(2000);
+            animText.start();
+        }else{
+            Intent intent = new Intent(getApplicationContext(), main.class);
+            startActivity(intent);
+            finish();
+        }
     }
 
 

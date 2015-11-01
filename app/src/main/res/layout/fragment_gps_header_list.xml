@@ -16,6 +16,30 @@
             android:layout_height="wrap_content"
             android:text="@string/SatelliteInfo" />
 
+        <TextView
+            android:id="@+id/AverageSpeedInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/AverageSpeedInfo" />
+
+        <TextView
+            android:id="@+id/InstanceSpeedInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/InstanceSpeedInfo" />
+
+        <TextView
+            android:id="@+id/RecordTimeInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/RecordTimeInfo" />
+
+        <TextView
+            android:id="@+id/DistanceInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/DistanceInfo" />
+
         <ListView
             android:id="@+id/GpsDatabaseInformation"
             android:layout_width="wrap_content"
@@ -30,7 +54,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:text="@string/LocationStart" />
-
     </LinearLayout>
 
 </FrameLayout>

@@ -17,6 +17,8 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.ctrl.supera.locationrecorder.debug.FileLog;
+
 public class DBManager {
     static final String TAG = "DBManager";
     private DatabaseHelper helper;
@@ -51,7 +53,7 @@ public class DBManager {
                     new Object[]{titleName, now.getTime()});
             db.setTransactionSuccessful();    //设置事务成功完成
         } catch (SQLException e) {
-            Log.d(TAG, e.toString());
+            FileLog.d(TAG, e.toString());
         } finally {
             db.endTransaction();    //结束事务
         }
@@ -66,7 +68,7 @@ public class DBManager {
         int item_delete;
         item_delete = db.delete(DatabaseHelper.DB_TITLE_NAME,
                 "name == ?", name);
-        Log.d(TAG, item_delete + " has been delete!");
+        FileLog.d(TAG, item_delete + " has been delete!");
     }
 
     /**
