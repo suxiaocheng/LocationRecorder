@@ -34,6 +34,14 @@
                 android:mimeType="*/*" />
         </Preference>
 
+        <com.ctrl.supera.locationrecorder.Setting.GPSUpdateTime
+            android:key="@string/preferenceGPSUpdateTime"
+            android:summary="@string/preferenceGPSUpdateTimeSummary"
+            android:title="@string/preferenceGPSUpdateTime"
+            android:defaultValue="0x1"
+            >
+        </com.ctrl.supera.locationrecorder.Setting.GPSUpdateTime>
+
     </PreferenceCategory>
 
 </PreferenceScreen>
