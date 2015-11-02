@@ -60,6 +60,10 @@ public class GPSService extends Service implements LocationListener {
     /* IBinder used for service and activity communication */
     private final IBinder mBinder = new LocalBinder();
 
+    /* Setting para */
+    private int ConfigUpdateMinTime = 1000;
+    private int ConfigUpdateMinDistance = 1;
+
     // Handler that receives messages from the thread
     private final class ServiceHandler extends Handler {
         public ServiceHandler(Looper looper) {
@@ -118,7 +122,7 @@ public class GPSService extends Service implements LocationListener {
         mServiceLooper = thread.getLooper();
         mServiceHandler = new ServiceHandler(mServiceLooper);
 
-        mgr.requestLocationUpdates(best, 1000, 1, this);
+        mgr.requestLocationUpdates(best, ConfigUpdateMinTime, ConfigUpdateMinDistance, this);
 
         mgr.addGpsStatusListener(statusListener);
     }

@@ -165,6 +165,7 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this, Prefs.class));
             return true;
         }
         return super.onOptionsItemSelected(item);

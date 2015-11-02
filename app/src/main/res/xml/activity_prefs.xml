@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <PreferenceCategory
+        android:key="preference_music_setting"
+        android:title="@string/preferenceMusicSettingTitle" >
+
+        <CheckBoxPreference
+            android:id="@+id/backgroundMusicEnable"
+            android:defaultValue="false"
+            android:key="@string/backgroundMusicEnable"
+            android:summary="@string/backgroundMusicSummary"
+            android:title="@string/backgroundMusicEnable" />
+
+        <ListPreference
+            android:defaultValue="@string/backgroundMusicLocationDefault"
+            android:dependency="@string/backgroundMusicEnable"
+            android:dialogTitle="@string/backgroundMusicLocationDialog"
+            android:entries="@array/ArrayMusicLocationList"
+            android:entryValues="@array/ArrayMusicLocationValues"
+            android:key="@string/backgroundMusicLocation"
+            android:title="@string/backgroundMusicLocation" />
+
+        <Preference
+            android:dependency="@string/backgroundMusicEnable"
+            android:key="@string/preferenceMusicSelect"
+            android:summary="@string/preferenceMusicSelectSummary"
+            android:title="@string/preferenceMusicSelect" >
+
+            <intent
+                android:action="android.intent.action.GET_CONTENT"
+                android:mimeType="*/*" />
+        </Preference>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

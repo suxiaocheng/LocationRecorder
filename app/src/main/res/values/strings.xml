@@ -15,6 +15,26 @@
     <string name="action_settings">Settings</string>
     <string name="NULL"></string>
 
+    <string name="settings_label">Settings…</string>
+
+    <string name="preferenceMusicSettingTitle">Music</string>
+
+    <string name="backgroundMusicEnable">Background Music Enable</string>
+    <string name="backgroundMusicSummary">Play background music</string>
+
+    <string name="backgroundMusicLocationDefault">internal</string>
+    <string name="backgroundMusicLocationDialog">setting music location</string>
+    <string name="backgroundMusicLocation">Music Location Selection</string>
+
+    <string name="preferenceMusicSelect">Select Music to play</string>
+    <string name="preferenceMusicSelectSummary">Please choose the background music</string>
+
+    <string name="preferenceMinTimeSelect">Select Time To Update GPS</string>
+    <string name="preferenceMinTimeSummary">Minimum Time Interval To Update GPS</string>
+
+    <string name="preferenceMinDistanceSelect">Select GPS Distance Change To Update</string>
+    <string name="preferenceMinDistanceSummary">Minimum GPS Distance Change To Update</string>
+
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_startup">LocationRecorder</string>

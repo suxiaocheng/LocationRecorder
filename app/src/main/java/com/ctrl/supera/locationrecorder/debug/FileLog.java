@@ -285,6 +285,9 @@ public class FileLog {
         Log.println(priority, tag, msg);
 
         if (fileOutputLogFile != null) {
+            SimpleDateFormat sDateFormat = new SimpleDateFormat("MM-dd_hh:mm:ss");
+            String date = sDateFormat.format(new java.util.Date());
+
             if (priority == VERBOSE) {
                 strPriority = "V";
             } else if (priority == DEBUG) {
@@ -298,7 +301,7 @@ public class FileLog {
             } else {
                 strPriority = "unknown";
             }
-            String strWriteBuffer = String.format("[%s] [%s] %s\r\n", strPriority.toString(), tag, msg);
+            String strWriteBuffer = String.format("[%s] [%s] [%s] %s\r\n", strPriority.toString(), date, tag, msg);
             try {
                 fileOutputLogFile.write(strWriteBuffer.getBytes());
                 fileOutputLogFile.flush();
