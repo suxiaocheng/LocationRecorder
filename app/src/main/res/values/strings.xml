@@ -32,8 +32,13 @@
     <string name="preferenceMinDistanceSelect">Select GPS Distance Change To Update</string>
     <string name="preferenceMinDistanceSummary">Minimum GPS Distance Change To Update</string>
 
+    <string name="preferenceGPSSettingTitle">GPS</string>
+
     <string name="preferenceGPSUpdateTime">Select Time To Update GPS</string>
     <string name="preferenceGPSUpdateTimeSummary">Minimum Time Interval To Update GPS</string>
+
+    <string name="preferenceGPSUpdateDistance">Select Distance To Update GPS</string>
+    <string name="preferenceGPSUpdateDistanceSummary">Minimum Distance Interval To Update GPS</string>
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

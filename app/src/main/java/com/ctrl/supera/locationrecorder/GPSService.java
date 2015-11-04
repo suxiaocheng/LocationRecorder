@@ -61,8 +61,8 @@ public class GPSService extends Service implements LocationListener {
     private final IBinder mBinder = new LocalBinder();
 
     /* Setting para */
-    private int ConfigUpdateMinTime = 1000;
-    private int ConfigUpdateMinDistance = 1;
+    private int ConfigUpdateMinTime;
+    private int ConfigUpdateMinDistance;
 
     // Handler that receives messages from the thread
     private final class ServiceHandler extends Handler {
@@ -94,6 +94,10 @@ public class GPSService extends Service implements LocationListener {
         // background priority so CPU-intensive work will not disrupt our UI.
         HandlerThread thread = new HandlerThread("ServiceStartArguments");
         thread.start();
+
+        /* Update the global var */
+        ConfigUpdateMinTime = Prefs.getGpsUpdateTime(this) * 1000;
+        ConfigUpdateMinDistance = Prefs.getGpsUpdateDistance(this);
 
         /* first get the location manager */
         mgr = (LocationManager) getSystemService(LOCATION_SERVICE);

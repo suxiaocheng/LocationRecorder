@@ -5,7 +5,7 @@
 
     <PreferenceCategory
         android:key="preference_music_setting"
-        android:title="@string/preferenceMusicSettingTitle" >
+        android:title="@string/preferenceMusicSettingTitle">
 
         <CheckBoxPreference
             android:id="@+id/backgroundMusicEnable"
@@ -27,21 +27,32 @@
             android:dependency="@string/backgroundMusicEnable"
             android:key="@string/preferenceMusicSelect"
             android:summary="@string/preferenceMusicSelectSummary"
-            android:title="@string/preferenceMusicSelect" >
+            android:title="@string/preferenceMusicSelect">
 
             <intent
                 android:action="android.intent.action.GET_CONTENT"
                 android:mimeType="*/*" />
         </Preference>
 
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="preference_gps_setting"
+        android:title="@string/preferenceGPSSettingTitle">
+
         <com.ctrl.supera.locationrecorder.Setting.GPSUpdateTime
+            android:defaultValue="0x1"
             android:key="@string/preferenceGPSUpdateTime"
             android:summary="@string/preferenceGPSUpdateTimeSummary"
-            android:title="@string/preferenceGPSUpdateTime"
+            android:title="@string/preferenceGPSUpdateTime"></com.ctrl.supera.locationrecorder.Setting.GPSUpdateTime>
+
+        <com.ctrl.supera.locationrecorder.Setting.GPSUpdateDistance
             android:defaultValue="0x1"
-            >
-        </com.ctrl.supera.locationrecorder.Setting.GPSUpdateTime>
+            android:key="@string/preferenceGPSUpdateDistance"
+            android:summary="@string/preferenceGPSUpdateDistanceSummary"
+            android:title="@string/preferenceGPSUpdateDistance"></com.ctrl.supera.locationrecorder.Setting.GPSUpdateDistance>
 
     </PreferenceCategory>
+
 
 </PreferenceScreen>

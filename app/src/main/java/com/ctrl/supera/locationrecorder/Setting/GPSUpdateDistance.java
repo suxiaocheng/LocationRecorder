@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.preference.DialogPreference;
+import android.preference.Preference;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.SeekBar;
@@ -13,19 +14,19 @@ import android.widget.TextView;
 import com.ctrl.supera.locationrecorder.R;
 
 /**
- * Created by Administrator on 2015/11/2.
+ * Created by Administrator on 2015/11/4.
  */
-public class GPSUpdateTime extends DialogPreference implements SeekBar.OnSeekBarChangeListener {
+public class GPSUpdateDistance extends DialogPreference implements SeekBar.OnSeekBarChangeListener {
     private static final int DEFAULT_VALUE = 0x01;
 
     private int mCurrentValue;
-    private SeekBar mUpdateTimeSeekBar;
-    private TextView mMinGpsUpdateTimeText;
+    private SeekBar mUpdateSeekBar;
+    private TextView mUpdateInfo;
 
-    public GPSUpdateTime(Context context, AttributeSet attrs) {
+    public GPSUpdateDistance(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        setDialogLayoutResource(R.layout.dialog_gps_update_time);
+        setDialogLayoutResource(R.layout.dialog_gps_update_distance);
         setPositiveButtonText(android.R.string.ok);
         setNegativeButtonText(android.R.string.cancel);
 
@@ -38,20 +39,20 @@ public class GPSUpdateTime extends DialogPreference implements SeekBar.OnSeekBar
 
         mCurrentValue = getPersistedInt(DEFAULT_VALUE);
 
-        mMinGpsUpdateTimeText = (TextView)v.findViewById(R.id.twMinGpsUpdateTime);
+        mUpdateInfo = (TextView) v.findViewById(R.id.twUpdateInfo);
         setProgressValue(mCurrentValue);
 
-        mUpdateTimeSeekBar = (SeekBar) v.findViewById(R.id.seekBarMinGpsUpdateTime);
-        mUpdateTimeSeekBar.setOnSeekBarChangeListener(this);
-        mUpdateTimeSeekBar.setProgress(mCurrentValue - 1);
+        mUpdateSeekBar = (SeekBar) v.findViewById(R.id.seekBarUpdateDistance);
+        mUpdateSeekBar.setOnSeekBarChangeListener(this);
+        mUpdateSeekBar.setProgress(mCurrentValue - 1);
 
         return v;
     }
 
-    private void setProgressValue(int value){
+    private void setProgressValue(int value) {
         String text;
-        text = String.format("%d S", value);
-        mMinGpsUpdateTimeText.setText(text);
+        text = String.format("%d M", value);
+        mUpdateInfo.setText(text);
     }
 
     @Override
@@ -95,7 +96,7 @@ public class GPSUpdateTime extends DialogPreference implements SeekBar.OnSeekBar
         return a.getInteger(index, DEFAULT_VALUE);
     }
 
-    private static class SavedState extends BaseSavedState {
+    private static class SavedState extends Preference.BaseSavedState {
         // Member that holds the setting's value
         // Change this data type to match the type saved by your Preference
         int value;
@@ -163,6 +164,6 @@ public class GPSUpdateTime extends DialogPreference implements SeekBar.OnSeekBar
         super.onRestoreInstanceState(myState.getSuperState());
 
         // Set this Preference's widget to reflect the restored state
-        mUpdateTimeSeekBar.setProgress(myState.value);
+        mUpdateSeekBar.setProgress(myState.value);
     }
 }

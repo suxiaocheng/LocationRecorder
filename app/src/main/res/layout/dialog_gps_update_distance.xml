@@ -7,15 +7,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="null"
-        android:id="@+id/twMinGpsUpdateTime"
+        android:id="@+id/twUpdateInfo"
         android:layout_gravity="center_horizontal" />
 
     <SeekBar
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:max="59"
+        android:max="29"
         android:progress="1"
-        android:id="@+id/seekBarMinGpsUpdateTime"
+        android:id="@+id/seekBarUpdateDistance"
         android:layout_gravity="center_horizontal" />
 
 </LinearLayout>

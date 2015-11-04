@@ -19,6 +19,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.ctrl.supera.locationrecorder.Setting.GPSUpdateDistance;
+import com.ctrl.supera.locationrecorder.Setting.GPSUpdateTime;
+
 import java.io.File;
 
 public class Prefs extends PreferenceActivity implements
@@ -35,12 +38,16 @@ public class Prefs extends PreferenceActivity implements
     private ListPreference MusicTypePref;
     private Preference MusicNamePref;
 
+    private GPSUpdateDistance mGpsUpdateDistance;
+    private GPSUpdateTime mGpsUpdateTime;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // setContentView(R.layout.activity_prefs);
         addPreferencesFromResource(R.xml.activity_prefs);
 
+        /* Music Category */
 		/* Update the default value from database */
         MusicOnPref = findPreference(getResources().getString(R.string.backgroundMusicEnable));
         MusicTypePref = (ListPreference) findPreference(getResources().getString(R.string.backgroundMusicLocation));
@@ -73,6 +80,13 @@ public class Prefs extends PreferenceActivity implements
             }
         };
         MusicNamePref.setOnPreferenceClickListener(onPreferenceClick);
+
+        /* GPS Category */
+        mGpsUpdateDistance = (GPSUpdateDistance)findPreference(getResources().getString(R.string.preferenceGPSUpdateDistance));
+        mGpsUpdateTime = (GPSUpdateTime)findPreference(getResources().getString(R.string.preferenceGPSUpdateTime));
+        mGpsUpdateDistance.setDefaultValue(getGpsUpdateDistance(this));
+        mGpsUpdateTime.setDefaultValue(getGpsUpdateTime(this));
+
         setUpActionBar();
     }
 
@@ -113,6 +127,30 @@ public class Prefs extends PreferenceActivity implements
     public static String getMusicName(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).
                 getString(context.getString(R.string.preferenceMusicSelect), "");
+    }
+
+    public static int getGpsUpdateTime(Context context) {
+        int value;
+        value = PreferenceManager.getDefaultSharedPreferences(context).
+                getInt(context.getString(R.string.preferenceGPSUpdateTime), 0x1);
+
+        if ((value < 1) || (value > 59)) {
+            value = 0x1;
+        }
+
+        return value;
+    }
+
+    public static int getGpsUpdateDistance(Context context) {
+        int value;
+        value = PreferenceManager.getDefaultSharedPreferences(context).
+                getInt(context.getString(R.string.preferenceGPSUpdateDistance), 0x1);
+
+        if ((value < 1) || (value > 29)) {
+            value = 0x1;
+        }
+
+        return value;
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -195,7 +233,7 @@ public class Prefs extends PreferenceActivity implements
             valid = true;
         }
         if (valid == false) {
-            Toast.makeText(context, "file operation error: \n" + name,
+            Toast.makeText(context, "file operation error: " + name,
                     Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(context, "file valid\n" + name, Toast.LENGTH_LONG)
@@ -215,6 +253,8 @@ public class Prefs extends PreferenceActivity implements
         Log.d(tag, "Enable:" + getMusicEnableStatus(context));
         Log.d(tag, "Type:" + getMusicType(context));
         Log.d(tag, "Name:" + getMusicName(context));
+        Log.d(tag, "Update Time:" + getGpsUpdateTime(context));
+        Log.d(tag, "Update Distance:" + getGpsUpdateDistance(context));
         return true;
     }
 }

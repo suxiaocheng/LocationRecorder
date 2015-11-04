@@ -1,5 +1,6 @@
 package com.ctrl.supera.locationrecorder;
 
+import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
@@ -13,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -76,6 +78,10 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
      */
     private PagerAdapter mPagerAdapter;
 
+    /**
+     * Restart services task
+     */
+    private RestartServicesTask mRestartServicesTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,8 +93,7 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
             FileLog.d(TAG, "Gps not opening");
         }
 
-        gpsIntent = new Intent(this, GPSService.class);
-        startService(gpsIntent);
+        startService();
 
         GetScreenOnLock();
 
@@ -101,6 +106,18 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
         mPager.setAdapter(mPagerAdapter);
     }
 
+    private void startService() {
+        gpsIntent = new Intent(this, GPSService.class);
+        startService(gpsIntent);
+    }
+
+    private void stopService() {
+        if (gpsIntent != null) {
+            stopService(gpsIntent);
+            gpsIntent = null;
+        }
+    }
+
     private void dumpLocation(Location location) {
         gpsHeaderListFragment fragment = (gpsHeaderListFragment) ((ScreenSlidePagerAdapter) mPagerAdapter).getItem(0);
         if (fragment == null) {
@@ -108,9 +125,9 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
         }
         if (location != null) {
             lastLocationInfo = location.toString();
-            if(lastLocationInfo != null) {
+            if (lastLocationInfo != null) {
                 fragment.output.setText(lastLocationInfo);
-            }else{
+            } else {
                 FileLog.d(TAG, "convert location to string fail");
             }
         } else {
@@ -123,7 +140,6 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
         super.onResume();
 
         bindService(gpsIntent, mConnection, Context.BIND_AUTO_CREATE);
-
         updateTask = new UpdateGPSStatusTask();
         updateTask.execute();
 
@@ -134,11 +150,12 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
     protected void onPause() {
         super.onPause();
 
-        updateTask.cancel(true);
-
+        if (updateTask != null) {
+            updateTask.cancel(true);
+            updateTask = null;
+        }
         if (mBound) {
             unbindService(mConnection);
-            mBound = false;
         }
 
         ReleaseScreenOnLock();
@@ -147,7 +164,7 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        stopService(gpsIntent);
+        stopService();
         gpsDBManager.closeDB();
     }
 
@@ -165,10 +182,20 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
-            startActivity(new Intent(this, Prefs.class));
+            startActivityForResult(new Intent(this, Prefs.class), 0x0);
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // If the request went well (OK) and the request was PICK_CONTACT_REQUEST
+        if (requestCode == 0x0) {
+            /* Stop the services and then restart */
+            mRestartServicesTask = new RestartServicesTask(true);
+            mRestartServicesTask.execute();
+        }
     }
 
     private void GetScreenOnLock() {
@@ -253,7 +280,7 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
          */
         protected Void doInBackground(String... urls) {
             while (true) {
-                if(mService != null){
+                if (mService != null) {
                     if (mService.needUpdate == true) {
                         mService.needUpdate = false;
                         publishProgress(0);
@@ -264,9 +291,7 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
                     }
                 }
                 try {
-                    synchronized (this) {
-                        wait(1000);
-                    }
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -287,9 +312,9 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
 
         protected void onProgressUpdate(Integer... type) {
             if (type[0] == 0) {
-                if((mService != null)  && (mService.locationInfo != null)) {
+                if ((mService != null) && (mService.locationInfo != null)) {
                     dumpLocation(mService.locationInfo);
-                }else{
+                } else {
                     FileLog.d(TAG, "File location info is null");
                 }
             } else if (type[0] == 1) {
@@ -297,9 +322,77 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
                 if (fragment == null) {
                     return;
                 }
-                if(mService.satelliteInfo != null) {
+                if (mService.satelliteInfo != null) {
                     fragment.satelliteInfoTextView.setText(mService.satelliteInfo);
                 }
+            }
+        }
+    }
+
+    /* AsyncTask to update the screen information */
+    private class RestartServicesTask extends AsyncTask<String, Integer, Void> {
+        private static final String TAG = "RestartServicesTask";
+        private boolean bNeedRestart;
+
+        public RestartServicesTask() {
+            bNeedRestart = false;
+        }
+
+        public RestartServicesTask(boolean bVal) {
+            bNeedRestart = bVal;
+        }
+
+        /**
+         * The system calls this to perform work in a worker thread and
+         * delivers it the parameters given to AsyncTask.execute()
+         */
+        protected Void doInBackground(String... urls) {
+            if (updateTask != null) {
+                FileLog.d(TAG, "stop update task");
+                updateTask.cancel(true);
+                /* wait for the update task to exit */
+                while (updateTask.getStatus() != AsyncTask.Status.FINISHED) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                FileLog.d(TAG, "stop update task ok!");
+                updateTask = null;
+            }
+            stopService();
+
+            if (isCancelled() == true) {
+                FileLog.d(TAG, "cancel by user");
+                return null;
+            }
+
+            if (bNeedRestart) {
+                FileLog.d(TAG, "Restart services");
+                startService();
+                bindService(gpsIntent, mConnection, Context.BIND_AUTO_CREATE);
+                while (mBound != true) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    if (isCancelled() == true) {
+                        FileLog.d(TAG, "cancel by user");
+                        return null;
+                    }
+                }
+                FileLog.d(TAG, "Bind Service ok!");
+            }
+
+            return null;
+        }
+
+        protected void onPostExecute(Void result) {
+            if (bNeedRestart) {
+                updateTask = new UpdateGPSStatusTask();
+                updateTask.execute();
             }
         }
     }
@@ -330,6 +423,5 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
     }
 
     public void onFragmentInteraction(Uri uri) {
-
     }
 }

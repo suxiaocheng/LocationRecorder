@@ -24,7 +24,8 @@ public class startup extends Activity {
         setContentView(R.layout.activity_startup);
 
         /* Startup logo animation operation */
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+        //if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+        if (false) {
             ImageView view = (ImageView) findViewById(R.id.startup_logo);
             ObjectAnimator animLogo = ObjectAnimator.ofFloat(view, "alpha", 0f, 1f);
             animLogo.setDuration(2000);
@@ -42,7 +43,7 @@ public class startup extends Activity {
             ObjectAnimator animText = ObjectAnimator.ofFloat(startupText, "alpha", 0f, 1f);
             animText.setDuration(2000);
             animText.start();
-        }else{
+        } else {
             Intent intent = new Intent(getApplicationContext(), main.class);
             startActivity(intent);
             finish();
