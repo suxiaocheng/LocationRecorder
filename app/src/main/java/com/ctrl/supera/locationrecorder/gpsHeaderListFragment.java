@@ -98,7 +98,7 @@ public class gpsHeaderListFragment extends Fragment implements View.OnClickListe
                 getActivity().getApplicationContext(),               // The application's Context object
                 android.R.layout.simple_list_item_1,   // A layout in XML for one row in the ListView
                 mCursor,                               // The result from the query
-                new String[]{DatabaseHelper.DB_TITLE_HEADER_NAME},          // A string array of column names in the cursor
+                new String[]{DatabaseHelper.DB_TITLE_NAME},          // A string array of column names in the cursor
                 new int[]{android.R.id.text2}, // An integer array of view IDs in the row layout
                 0);                                    // Flags (usually none are needed)
         gpsHeaderList.setAdapter(mCursorAdapter);

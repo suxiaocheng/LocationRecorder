@@ -39,18 +39,14 @@ public class DBManager {
     /**
      * add table title
      *
-     * @param name
+     * @param
      */
-    public void add(String name) {
+    public void add(double longitude, double latitude, long time) {
         db.beginTransaction();    //开始事务
         try {
-            String titleName;
-            Date now = new Date();
-            titleName = now.toString();
-
             db.execSQL("INSERT INTO " + DatabaseHelper.DB_TITLE_NAME +
-                            " VALUES (NULL, ?, ?)",
-                    new Object[]{titleName, now.getTime()});
+                            " VALUES (NULL, ?, ?, ?)",
+                    new Object[]{longitude, latitude, time});
             db.setTransactionSuccessful();    //设置事务成功完成
         } catch (SQLException e) {
             FileLog.d(TAG, e.toString());

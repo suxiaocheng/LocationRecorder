@@ -24,7 +24,7 @@
         </activity>
 
         <activity
-            android:name=".Prefs" >
+            android:name=".Setting.Prefs" >
         </activity>
 
         <service android:name=".GPSService" />

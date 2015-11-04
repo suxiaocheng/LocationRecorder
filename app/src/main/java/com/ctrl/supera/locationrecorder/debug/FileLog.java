@@ -54,7 +54,7 @@ public class FileLog {
     private static FileOutputStream fileOutputLogFile;
 
     static {
-        SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy-MM-dd_hhmmss");
+        SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy-MM-dd_HHmmss");
         String date = sDateFormat.format(new java.util.Date());
         /* Open the debug log file */
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
@@ -285,7 +285,7 @@ public class FileLog {
         Log.println(priority, tag, msg);
 
         if (fileOutputLogFile != null) {
-            SimpleDateFormat sDateFormat = new SimpleDateFormat("MM-dd_hh:mm:ss");
+            SimpleDateFormat sDateFormat = new SimpleDateFormat("MM-dd_HH:mm:ss.S");
             String date = sDateFormat.format(new java.util.Date());
 
             if (priority == VERBOSE) {

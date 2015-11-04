@@ -11,7 +11,6 @@ import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.location.LocationProvider;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,9 +19,9 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 import android.widget.Toast;
 
+import com.ctrl.supera.locationrecorder.Setting.Prefs;
 import com.ctrl.supera.locationrecorder.debug.FileLog;
 
 import java.util.ArrayList;
@@ -41,7 +40,13 @@ public class GPSService extends Service implements LocationListener {
     /* GPS data struct */
     private String best;
     private LocationManager mgr;
-    public Location locationInfo;
+
+    /* location information */
+    public Location currentLocationInfo;
+    public Location lastLocationInfo;
+    public Location startLocationInfo;
+    private float instanceSpeed, averageSpeed;
+    private double startupTime;
     public static boolean needUpdate = false;
 
     /* Satellite info */
@@ -75,7 +80,8 @@ public class GPSService extends Service implements LocationListener {
             while (true) {
                 synchronized (this) {
                     try {
-                        wait(1000);
+                        //wait(1000);
+                        Thread.sleep(1000);
                     } catch (Exception e) {
                     }
                 }
@@ -98,6 +104,7 @@ public class GPSService extends Service implements LocationListener {
         /* Update the global var */
         ConfigUpdateMinTime = Prefs.getGpsUpdateTime(this) * 1000;
         ConfigUpdateMinDistance = Prefs.getGpsUpdateDistance(this);
+        //startupTime =
 
         /* first get the location manager */
         mgr = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -171,6 +178,10 @@ public class GPSService extends Service implements LocationListener {
             // Stop updates to save power while app paused
             mgr.removeUpdates(this);
         }
+        if (gpsDBManager != null) {
+            gpsDBManager.closeDB();
+            gpsDBManager = null;
+        }
 
         Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show();
     }
@@ -179,19 +190,22 @@ public class GPSService extends Service implements LocationListener {
         synchronized (this) {
             FileLog.d(TAG, "Location change ");
             if(location != null){
-                locationInfo = location;
+                lastLocationInfo = currentLocationInfo;
+                currentLocationInfo = location;
+
                 needUpdate = true;
-                FileLog.d(TAG, "Location info: " + locationInfo.toString());
+                FileLog.d(TAG, "Location info: " + currentLocationInfo.toString());
             }
 
             if (needRecordLocation) {
                 /* First check if the database is exist or not */
                 if (gpsDBManager == null) {
                     gpsDBManager = new DBManager(this);
-
-                    /* Add Header Item to the DataBase */
-                    gpsDBManager.add("");
                 }
+                if(startLocationInfo == null){
+                    startLocationInfo = currentLocationInfo;
+                }
+                gpsDBManager.add(location.getLongitude(), location.getLatitude(), location.getTime());
                 /* Log location information to file */
                 FileLog.d(TAG, location.toString());
             } else {

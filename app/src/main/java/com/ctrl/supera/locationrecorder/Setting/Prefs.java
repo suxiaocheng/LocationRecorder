@@ -1,4 +1,4 @@
-package com.ctrl.supera.locationrecorder;
+package com.ctrl.supera.locationrecorder.Setting;
 
 import android.annotation.TargetApi;
 import android.app.ActionBar;
@@ -19,8 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.ctrl.supera.locationrecorder.Setting.GPSUpdateDistance;
-import com.ctrl.supera.locationrecorder.Setting.GPSUpdateTime;
+import com.ctrl.supera.locationrecorder.R;
 
 import java.io.File;
 
