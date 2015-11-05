@@ -25,6 +25,8 @@ import android.widget.Toast;
 import com.ctrl.supera.locationrecorder.Setting.Prefs;
 import com.ctrl.supera.locationrecorder.debug.FileLog;
 
+import java.util.Calendar;
+
 
 public class main extends ActionBarActivity implements gpsHeaderListFragment.OnFragmentInteractionListener, gpsItemListFragment.OnFragmentInteractionListener {
 
@@ -297,8 +299,8 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
 
         protected void onProgressUpdate(Integer... type) {
             if (type[0] == 0) {
-                if ((mService != null) && (mService.locationInfo != null)) {
-                    dumpLocation(mService.locationInfo);
+                if ((mService != null) && (mService.currentLocationInfo != null)) {
+                    dumpLocation(mService.currentLocationInfo);
                 } else {
                     FileLog.d(TAG, "File location info is null");
                 }
@@ -408,5 +410,73 @@ public class main extends ActionBarActivity implements gpsHeaderListFragment.OnF
     }
 
     public void onFragmentInteraction(Uri uri) {
+    }
+
+
+    /* use for test only */
+    /* function use for test database */
+    public static void testDatabase(Context c) {
+        InsertDataBaseItem insertDataBaseItem = new InsertDataBaseItem(c);
+        insertDataBaseItem.execute();
+    }
+
+    /* AsyncTask to update the screen information */
+    private static class InsertDataBaseItem extends AsyncTask<String, Integer, Void> {
+        private DBManager testDb;
+        private long timeInMiliSecond;
+        private Double mLongitude, mLatitude;
+        private Context mContext;
+
+        public InsertDataBaseItem(Context c){
+            mContext = c;
+        }
+        /**
+         * The system calls this to perform work in a worker thread and
+         * delivers it the parameters given to AsyncTask.execute()
+         */
+        protected Void doInBackground(String... urls) {
+            while (true) {
+                Calendar calendar = Calendar.getInstance();
+                timeInMiliSecond = calendar.getTimeInMillis();
+                if(testDb != null){
+                    testDb.add(mLongitude, mLatitude, timeInMiliSecond);
+                    mLongitude+=5;
+                    mLatitude++;
+                    if(mLatitude > 100.){
+                        break;
+                    }
+                }
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (isCancelled()) {
+                    break;
+                }
+            }
+            if(testDb != null){
+                testDb.closeDB();
+                testDb = null;
+            }
+
+            return null;
+        }
+
+        protected void onPreExecute() {
+            testDb = new DBManager(mContext);
+            mLongitude = 0.;
+            mLatitude = 0.;
+        }
+
+        /**
+         * The system calls this to perform work in the UI thread and delivers
+         * the result from doInBackground()
+         */
+        protected void onPostExecute(Void result) {
+        }
+
+        protected void onProgressUpdate(Integer... type) {
+        }
     }
 }

@@ -17,15 +17,16 @@ import java.util.Calendar;
 public class DatabaseHelper extends SQLiteOpenHelper {
     static final String TAG = "DatabaseHelper";
 
-    private static final String DB_NAME = "gpsData"; //数据库名称
-    private static final String DB_NAME_SUBFIX = ".db";
-    public static final String DB_TITLE_NAME = "location"; //数据库名称
+    private static final String DB_NAME = "gpsData.db"; //数据库名称
+    private static final String DB_TITLE_NAME = "location"; //数据库名称
     private static final int version = 1; //数据库版本
 
     public static final String DB_TITLE_HEADER_ID = "_id";
     public static final String DB_LATITUDE_NAME = "latitude";
     public static final String DB_LONGITUDE_NAME = "longitude";
     public static final String DB_TIME_STAMP = "time_stamp";
+
+    public String dbCurrentName;
 
     public DatabaseHelper(Context context) {
         super(context, DB_NAME, null, version);
@@ -34,10 +35,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        SimpleDateFormat sDateFormat = new SimpleDateFormat("MM-dd_HHmmss");
+        SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
         String date = sDateFormat.format(new java.util.Date());
 
-        String sql = "create table if not exists " + DB_TITLE_NAME + date + DB_NAME_SUBFIX +
+        dbCurrentName = DB_TITLE_NAME + date;
+
+        String sql = "create table if not exists " + dbCurrentName +
                 "(" + DB_TITLE_HEADER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 DB_LATITUDE_NAME + " REAL not null," +
                 DB_LONGITUDE_NAME + " REAL not null," +

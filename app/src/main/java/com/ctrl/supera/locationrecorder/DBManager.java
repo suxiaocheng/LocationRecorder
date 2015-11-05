@@ -44,7 +44,7 @@ public class DBManager {
     public void add(double longitude, double latitude, long time) {
         db.beginTransaction();    //开始事务
         try {
-            db.execSQL("INSERT INTO " + DatabaseHelper.DB_TITLE_NAME +
+            db.execSQL("INSERT INTO " + helper.dbCurrentName +
                             " VALUES (NULL, ?, ?, ?)",
                     new Object[]{longitude, latitude, time});
             db.setTransactionSuccessful();    //设置事务成功完成
@@ -62,7 +62,7 @@ public class DBManager {
      */
     public void deleteOldItemHeader(String name[]) {
         int item_delete;
-        item_delete = db.delete(DatabaseHelper.DB_TITLE_NAME,
+        item_delete = db.delete(helper.dbCurrentName,
                 "name == ?", name);
         FileLog.d(TAG, item_delete + " has been delete!");
     }
@@ -91,7 +91,7 @@ public class DBManager {
      */
     public Cursor queryTheCursor() {
         Cursor c = db.rawQuery("SELECT * FROM " +
-                DatabaseHelper.DB_TITLE_NAME, null);
+                helper.dbCurrentName, null);
         return c;
     }
 
